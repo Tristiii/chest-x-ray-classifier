@@ -6,7 +6,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
-from torchmetrics.classification import MultilabelF1Score
+from torchmetrics.classification import MultilabelAccuracy, MultilabelF1Score, MultilabelAUROC
 
 from medmnist import ChestMNIST
 
@@ -43,8 +43,10 @@ torch.manual_seed(42)
 
 model = ChestDenseNet121().to(device)
 loss_fn = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0005, weight_decay=0.0001)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+accuracy_fn = MultilabelAccuracy(num_labels=14, average='macro').to(device)
 f1_fn = MultilabelF1Score(num_labels=14, average='macro').to(device)
+AUROC_fn = MultilabelAUROC(num_labels=14, average='macro').to(device)
 
 for epoch in range(30):
     total_loss = 0
@@ -72,9 +74,17 @@ for epoch in range(30):
 
             y_pred = model(X_batch)
             probs = torch.sigmoid(y_pred)
+
+            accuracy_fn.update(probs, y_batch)
             f1_fn.update(probs, y_batch)
+            AUROC_fn.update(probs, y_batch)
 
+        accuracy = accuracy_fn.compute()
         f1 = f1_fn.compute()
-        f1_fn.reset()
+        AUROC = AUROC_fn.compute()
 
-    print(f'Epoch {epoch} | Loss: {total_loss:.4f} | F1: {f1:.4f}')
+        accuracy_fn.reset()
+        f1_fn.reset()
+        AUROC_fn.reset()
+
+    print(f'Epoch {epoch} | Accuracy: {accuracy:.2%} | Loss: {total_loss:.4f} | F1: {f1:.4f} | AUROC: {AUROC:.4f}')
