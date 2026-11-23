@@ -22,8 +22,8 @@ Distribution of the data (total 112.120 samples):
 
 ### 2.2 Model
 
-For now, only a variant of DenseNet121 has been implemented.
+For now, only a variant of ResNet18 has been implemented. Accuracy, loss, F1-score and AUROC were tracked in 50 epochs for the training and validation datasets.
 
 ## 3. Results
 
-The DenseNet121-like model obtains an F1-score of 0,17.
+The ResNet18-like model obtains an accuracy of 90,71%, F1-score of 0.1624 and AUROC of 0.6952 on the test dataset.
