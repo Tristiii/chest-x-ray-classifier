@@ -13,6 +13,7 @@ dependencies = [
     "pandas>=3.1.1",
     "scikit-learn>=1.9.1",
     "torch>=2.15.0",
+    "torchaudio>=2.11.1",
     "torchmetrics>=1.9.0",
     "torchvision>=0.29.2",
 ]
@@ -23,3 +24,13 @@ chest-x-ray-classifier = "chest_x_ray_classifier:main"
 [build-system]
 requires = ["uv_build>=0.13.7,<0.14.0"]
 build-backend = "uv_build"
+
+[tool.uv.sources]
+torch = { index = "pytorch" }
+torchvision = { index = "pytorch" }
+torchaudio = { index = "pytorch" }
+
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu132"
+explicit = true

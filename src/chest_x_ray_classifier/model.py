@@ -1,6 +1,8 @@
 import torch
 from torch import nn
 
+from torchvision.models import densenet121
+
 class VGGStyleCNN(nn.Module):
     def __init__(self) -> None:
         super().__init__()
@@ -71,3 +73,24 @@ class VGGStyleCNN(nn.Module):
         x_3 = self.block_3(x_2)
         x_4 = self.block_4(x_3)
         return x_4
+
+
+class ChestDenseNet121(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+
+        self.model = densenet121(weights="IMAGENET1K_V1")
+
+        self.model.features.conv0 = nn.Conv2d(
+            in_channels=1,
+            out_channels=64,
+            kernel_size=7,
+            stride=1,
+            padding=3,
+            bias=False
+        )
+        self.model.features.pool0 = nn.Identity()
+        self.model.classifier = nn.Linear(1024, 14)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.model(x)
